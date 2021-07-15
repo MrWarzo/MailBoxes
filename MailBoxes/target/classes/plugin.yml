@@ -1,0 +1,9 @@
+name: MailBoxes
+version: 1.0-SNAPSHOT
+main: fr.mrwarzo.mailboxes.MailBoxes
+api-version: 1.16
+prefix: \[MBx\]
+load: STARTUP
+authors: [ MrWarzo0 ]
+description: Système de mailbox avec envoit d'items
+depend: [SmartInvs]
