@@ -50,7 +50,7 @@ public class MbSendMenu implements InventoryProvider {
                 .setName("§6Page précédente")
                 .toItemStack(), e -> changePage(player, contents, 0)));
         contents.set(5, 4, ClickableItem.of(new ItemBuilder(Material.SUNFLOWER)
-                        .setName("§l§Raffraichis la page")
+                        .setName("§6§lRaffraichis la page")
                         .toItemStack()
                 , e -> refreshInventory(player)));
         contents.set(5, 5, ClickableItem.of(new ItemBuilder(Material.PAPER)
@@ -67,9 +67,9 @@ public class MbSendMenu implements InventoryProvider {
         final float volume = MbSendMenu.vol;
 
         if (direction == 0) {
-            contents.pagination().previous();
+            INVENTORY.open(player, contents.pagination().previous().getPage());
         } else {
-            contents.pagination().next();
+            INVENTORY.open(player, contents.pagination().next().getPage());
         }
 
         player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, volume, 1);
@@ -88,12 +88,20 @@ public class MbSendMenu implements InventoryProvider {
         ClickableItem[] playerHeads = new ClickableItem[playerList.size()];
 
         for(int i = 0; i < playerList.size(); i++) {
+            int finalI = i;
             playerHeads[i] = ClickableItem.of(new ItemBuilder(Material.PLAYER_HEAD)
                             .setSkullOwner(playerList.get(i).getName())
                             .toItemStack()
-                    , e -> MbSendMenu2.INVENTORY.open(player));
+                    , e -> openPackageMenu(player, playerList.get(finalI).getUniqueId().toString()));
         }
 
         return playerHeads;
+    }
+
+    private void openPackageMenu(Player sender, String uniqueID) {
+        Player reciever = Bukkit.getPlayer(uniqueID);
+
+
+        MbPackageMenu.INVENTORY.open(sender);
     }
 }

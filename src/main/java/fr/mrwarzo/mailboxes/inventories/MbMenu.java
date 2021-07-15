@@ -46,7 +46,7 @@ public class MbMenu implements InventoryProvider {
                         .setName("§a§lEnvoyer un mail à quelqu'un")
                         .toItemStack()
                 , e -> openSendMenu(player)));
-        contents.set(0, 1, ClickableItem.of(new ItemBuilder(Material.SHIELD)
+        contents.set(0, 2, ClickableItem.of(new ItemBuilder(Material.SHIELD)
                         .setName("§c§lBloquer un joueur")
                         .toItemStack()
                 , e -> openBlockMenu(player)));
@@ -77,7 +77,7 @@ public class MbMenu implements InventoryProvider {
     private void openBlockMenu(Player player) {
         final float volume = MbMenu.vol;
 
-        player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, volume, 1);
+        player.playSound(player.getLocation(), Sound.ENTITY_SKELETON_HORSE_AMBIENT, volume, 1);
         MbSendMenu.INVENTORY.open(player);
     }
 }

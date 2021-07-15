@@ -31,12 +31,15 @@ public class MailBoxesCommand extends BaseCommand {
     @Subcommand("reload")
     @Syntax("/mailbox reload")
     public static void onReload(Player player, String[] args) {
+        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
+
         try {
             Managers.getConfigManager().setupFiles();
 
-            player.sendMessage(ChatColor.GREEN + "[MailBoxes] Reload reussi");
+            player.sendMessage(cfgSection.getString("reload-success"));
         } catch (Exception e) {
-            player.sendMessage(ChatColor.DARK_RED + "[MailBoxes] Reload échoué");
+            player.sendMessage(cfgSection.getString("reload-failed"));
         }
     }
 

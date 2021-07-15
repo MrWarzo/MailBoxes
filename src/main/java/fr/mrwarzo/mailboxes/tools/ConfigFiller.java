@@ -13,10 +13,12 @@ public class ConfigFiller implements CFGFiller {
         cfgSection.set("sound-on-click", true);
         cfgSection.set("volume", 25);
         cfgSection.set("free-mails", true);
+        cfgSection.set("reload-success", "&l&a[MailBoxes] &r&aReload reussi");
+        cfgSection.set("reload-failed", "&l&a[MailBoxes] &r&aReload échoué");
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        ConfigurationSection boxesSection = fileConfiguration.createSection("boxes");
-
+        ConfigurationSection boxesSection = fileConfiguration.createSection("player-boxes");
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
