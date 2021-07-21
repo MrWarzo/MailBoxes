@@ -3,18 +3,16 @@ package fr.mrwarzo.mailboxes.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import fr.mrwarzo.mailboxes.inventories.MbMenu;
-import fr.mrwarzo.mailboxes.managers.CommandsManager;
 import fr.mrwarzo.mailboxes.managers.Managers;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @CommandAlias("mb|mbox|mailbox")
 public class MailBoxesCommand extends BaseCommand {
@@ -43,12 +41,51 @@ public class MailBoxesCommand extends BaseCommand {
         }
     }
 
-    @Default
-    @Syntax("/mailbox")
-    public static void onMb(Player player, String[] args) {
+    @Subcommand("send")
+    @Syntax("/mailbox send [player]")
+    public static void onSend(Player player, String[] args) {
         FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
         ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
 
+        try {
+            ItemStack item = player.getInventory().getItemInMainHand();
+            Player reciever = Bukkit.getPlayer(args[0]);
+            Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
+
+            ConfigurationSection bxSection = cfg.getConfigurationSection("player-boxes");
+            if(boxes.containsKey(reciever)) {
+                List<ItemStack> items = boxes.get(reciever);
+                items.add(item);
+                boxes.replace(reciever, items);
+            }
+            else {
+                List<ItemStack> items = new ArrayList<>();
+                items.add(item);
+                boxes.put(reciever, items);
+            }
+
+            ConfigurationSection bxReciever = bxSection.getConfigurationSection(reciever.getUniqueId().toString());
+            bxReciever.createSection("box");
+
+        } catch (Exception e) {
+            player.sendMessage(cfgSection.getString("no-player-arg"));
+        }
+    }
+
+    @Subcommand("map")
+    @Syntax("/mailbox map")
+    public static void onMap(Player player, String[] args) {
+        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
+
+        for(Map.Entry<Player, List<ItemStack>> entry:Managers.getInstance().getBoxes().entrySet()) {
+            player.sendMessage(entry.getKey().toString() + " ----- " + entry.getValue().toString());
+        }
+    }
+
+    @Default
+    @Syntax("/mailbox")
+    public static void onMb(Player player, String[] args) {
         MbMenu.INVENTORY.open(player);
     }
 }

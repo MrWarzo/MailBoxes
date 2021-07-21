@@ -17,6 +17,7 @@ public class Managers {
         try {
             CommandsManager.loadCommands(instance);
             cfgManager.setupFiles();
+            instance.restoreData();
 
             // Envoie d'un message de validation à la console au démarrage
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[MailBoxes] Activation reussie");

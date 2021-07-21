@@ -10,7 +10,11 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.InventoryView;
 
 public class MbPackageMenu implements InventoryProvider {
     public static final SmartInventory INVENTORY = SmartInventory.builder()
@@ -18,8 +22,10 @@ public class MbPackageMenu implements InventoryProvider {
             .provider(new MbPackageMenu())
             .type(InventoryType.WORKBENCH)
             .title("Pose le contenu de ton mail : ")
+            //.listener(new InventoryClickEvent(InventoryView.OUTSIDE, InventoryType.SlotType.CRAFTING, 1, ClickType.LEFT, InventoryAction.MOVE_TO_OTHER_INVENTORY))
             .build();
 
+    //public InventoryClickEvent(@NotNull InventoryView view, @NotNull SlotType type, int slot, @NotNull ClickType click, @NotNull InventoryAction action) {
     @Override
     public void init(Player player, InventoryContents contents) {
         contents.set(0,0, ClickableItem.of(new ItemBuilder(Material.ELYTRA)

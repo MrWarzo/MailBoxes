@@ -15,6 +15,7 @@ public class ConfigFiller implements CFGFiller {
         cfgSection.set("free-mails", true);
         cfgSection.set("reload-success", "&l&a[MailBoxes] &r&aReload reussi");
         cfgSection.set("reload-failed", "&l&a[MailBoxes] &r&aReload échoué");
+        cfgSection.set("no-player-arg", "&cVous devez choisir un joueur.");
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
