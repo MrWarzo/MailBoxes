@@ -5,6 +5,8 @@ import co.aikar.commands.annotation.*;
 import fr.mrwarzo.mailboxes.inventories.MbMenu;
 import fr.mrwarzo.mailboxes.managers.Managers;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -49,20 +51,28 @@ public class MailBoxesCommand extends BaseCommand {
 
         try {
             ItemStack item = player.getInventory().getItemInMainHand();
+
+            if (item.getType().equals(Material.AIR)) {
+                throw new Exception();
+            }
+
             Player reciever = Bukkit.getPlayer(args[0]);
             Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
 
             ConfigurationSection bxSection = cfg.getConfigurationSection("player-boxes");
-            if(boxes.containsKey(reciever)) {
+            if (boxes.containsKey(reciever)) {
                 List<ItemStack> items = boxes.get(reciever);
                 items.add(item);
                 boxes.replace(reciever, items);
-            }
-            else {
+            } else {
                 List<ItemStack> items = new ArrayList<>();
                 items.add(item);
                 boxes.put(reciever, items);
             }
+
+            player.getInventory().setItemInMainHand(null);
+            player.sendMessage(ChatColor.GREEN + "Vous avez envoyé " + ChatColor.GOLD + item.getAmount() + " * "
+                    + item.getI18NDisplayName() + ChatColor.GREEN + " à " + ChatColor.GOLD + reciever.getName());
 
             ConfigurationSection bxReciever = bxSection.getConfigurationSection(reciever.getUniqueId().toString());
             bxReciever.createSection("box");
@@ -75,10 +85,10 @@ public class MailBoxesCommand extends BaseCommand {
     @Subcommand("map")
     @Syntax("/mailbox map")
     public static void onMap(Player player, String[] args) {
-        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
-        ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
+        //FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        //ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
 
-        for(Map.Entry<Player, List<ItemStack>> entry:Managers.getInstance().getBoxes().entrySet()) {
+        for (Map.Entry<Player, List<ItemStack>> entry : Managers.getInstance().getBoxes().entrySet()) {
             player.sendMessage(entry.getKey().toString() + " ----- " + entry.getValue().toString());
         }
     }

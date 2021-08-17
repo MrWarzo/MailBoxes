@@ -6,6 +6,7 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.Pagination;
 import fr.minuskube.inv.content.SlotIterator;
+import fr.mrwarzo.mailboxes.MailBoxes;
 import fr.mrwarzo.mailboxes.managers.Managers;
 import fr.mrwarzo.mailboxes.tools.ItemBuilder;
 import org.bukkit.Material;
@@ -13,9 +14,11 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MbPersonalMenu implements InventoryProvider {
     private static int rows;
@@ -49,7 +52,7 @@ public class MbPersonalMenu implements InventoryProvider {
     public void init(Player player, InventoryContents contents) {
         Pagination pagination = contents.pagination();
         pagination.setItems(getPlayerBox(player));
-        pagination.setItemsPerPage(45);
+        pagination.setItemsPerPage(27);
         pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0));
 
         contents.set(MbPersonalMenu.rows - 1, 3, ClickableItem.of(new ItemBuilder(Material.PAPER)
@@ -90,11 +93,21 @@ public class MbPersonalMenu implements InventoryProvider {
     }
 
     private ClickableItem[] getPlayerBox(Player player) {
-        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        /*FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
         ConfigurationSection bxSection = cfg.getConfigurationSection("player-boxes");
-        ConfigurationSection bxPlayer;
-        List<ClickableItem> itemList = new ArrayList<>();
+        ConfigurationSection bxPlayer;*/
+        Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
+        ClickableItem[] clickableItemList;
 
+        if (boxes.isEmpty()) {
+            clickableItemList = new ClickableItem[1];
+            clickableItemList[0] = ClickableItem.empty(new ItemStack(Material.AIR));
+            return clickableItemList;
+        }
+
+        List<ItemStack> itemStackList = new ArrayList<>(boxes.get(player));
+
+        /*
         if(bxSection.contains(player.getUniqueId().toString())) {
             bxPlayer = bxSection.getConfigurationSection(player.getUniqueId().toString());
         }
@@ -103,7 +116,22 @@ public class MbPersonalMenu implements InventoryProvider {
             bxPlayer = bxSection.getConfigurationSection(player.getUniqueId().toString());
             bxPlayer.createSection("box");
         }
+        */
 
-        return null;
+        clickableItemList = new ClickableItem[itemStackList.size()];
+
+        int i = 0;
+        for (
+                ItemStack is : itemStackList) {
+            ClickableItem ci = ClickableItem.of(is, e -> getItemInInv(player));
+            clickableItemList[i] = ci;
+            i++;
+        }
+
+        return clickableItemList.clone();
+    }
+
+    private void getItemInInv(Player player) {
+        player.sendMessage("c good");
     }
 }
