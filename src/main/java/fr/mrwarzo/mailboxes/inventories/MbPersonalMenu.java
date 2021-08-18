@@ -9,11 +9,14 @@ import fr.minuskube.inv.content.SlotIterator;
 import fr.mrwarzo.mailboxes.MailBoxes;
 import fr.mrwarzo.mailboxes.managers.Managers;
 import fr.mrwarzo.mailboxes.tools.ItemBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -50,11 +53,6 @@ public class MbPersonalMenu implements InventoryProvider {
 
     @Override
     public void init(Player player, InventoryContents contents) {
-        Pagination pagination = contents.pagination();
-        pagination.setItems(getPlayerBox(player));
-        pagination.setItemsPerPage(27);
-        pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0));
-
         contents.set(MbPersonalMenu.rows - 1, 3, ClickableItem.of(new ItemBuilder(Material.PAPER)
                 .setName("§6Page précédente")
                 .toItemStack(), e -> changePage(player, contents, 0)));
@@ -69,7 +67,10 @@ public class MbPersonalMenu implements InventoryProvider {
 
     @Override
     public void update(Player player, InventoryContents contents) {
-
+        Pagination pagination = contents.pagination();
+        pagination.setItems(getPlayerBox(player));
+        pagination.setItemsPerPage(27);
+        pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0));
     }
 
     private void changePage(Player player, InventoryContents contents, int direction) {
@@ -93,9 +94,6 @@ public class MbPersonalMenu implements InventoryProvider {
     }
 
     private ClickableItem[] getPlayerBox(Player player) {
-        /*FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
-        ConfigurationSection bxSection = cfg.getConfigurationSection("player-boxes");
-        ConfigurationSection bxPlayer;*/
         Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
         ClickableItem[] clickableItemList;
 
@@ -107,23 +105,12 @@ public class MbPersonalMenu implements InventoryProvider {
 
         List<ItemStack> itemStackList = new ArrayList<>(boxes.get(player));
 
-        /*
-        if(bxSection.contains(player.getUniqueId().toString())) {
-            bxPlayer = bxSection.getConfigurationSection(player.getUniqueId().toString());
-        }
-        else {
-            bxSection.createSection(player.getUniqueId().toString());
-            bxPlayer = bxSection.getConfigurationSection(player.getUniqueId().toString());
-            bxPlayer.createSection("box");
-        }
-        */
-
         clickableItemList = new ClickableItem[itemStackList.size()];
 
         int i = 0;
         for (
                 ItemStack is : itemStackList) {
-            ClickableItem ci = ClickableItem.of(is, e -> getItemInInv(player));
+            ClickableItem ci = ClickableItem.of(is, e -> getItemInInv(player, e));
             clickableItemList[i] = ci;
             i++;
         }
@@ -131,7 +118,29 @@ public class MbPersonalMenu implements InventoryProvider {
         return clickableItemList.clone();
     }
 
-    private void getItemInInv(Player player) {
-        player.sendMessage("c good");
+    private void getItemInInv(Player player, InventoryClickEvent e) {
+        if(isFull(player.getInventory().getStorageContents())) {
+            player.sendMessage(ChatColor.RED + "Vous n'avez plus de place dans votre inventaire !");
+        }
+        else {
+            ItemStack item = e.getCurrentItem();
+            Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
+
+            boxes.get(player).remove(item);
+            player.getInventory().addItem(item);
+            player.sendMessage(ChatColor.GREEN + "Vous avez récupéré " + ChatColor.GOLD + item.getAmount() + " * "
+                    + item.getI18NDisplayName());
+        }
+    }
+
+    private boolean isFull(ItemStack[] storage) {
+        int j = storage.length;
+        for (ItemStack i:storage) {
+            if (i != null) {
+                j--;
+            }
+        }
+
+        return j == 0;
     }
 }
