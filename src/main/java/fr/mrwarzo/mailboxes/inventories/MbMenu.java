@@ -24,7 +24,7 @@ public class MbMenu implements InventoryProvider {
             .build();
 
     private MbMenu() {
-        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("config.yml");
         ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
 
         if (cfgSection.getBoolean("sound-on-click")) {

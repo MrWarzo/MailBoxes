@@ -2,6 +2,7 @@ package fr.mrwarzo.mailboxes.managers;
 
 import fr.mrwarzo.mailboxes.tools.CFGFiller;
 import fr.mrwarzo.mailboxes.tools.ConfigFiller;
+import fr.mrwarzo.mailboxes.tools.MailBoxesFiller;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,7 +38,8 @@ public class ConfigManager {
         } else {
             plugin.getLogger().log(Level.INFO, "DataFolder loaded successful.");
         }
-        initNewFile("mailboxes.yml", new ConfigFiller());
+        initNewFile("config.yml", new ConfigFiller());
+        initNewFile("mailboxes.yml", new MailBoxesFiller());
     }
 
     public void initNewFile(String fileName, CFGFiller filler) {

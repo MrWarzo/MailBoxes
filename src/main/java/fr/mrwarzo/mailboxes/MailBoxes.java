@@ -9,9 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class MailBoxes extends JavaPlugin {
     private static Map<Player, List<ItemStack>> boxes;
@@ -35,23 +33,36 @@ public final class MailBoxes extends JavaPlugin {
     }
 
     public void saveData() throws IOException {
-        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
-        ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
-        ConfigurationSection bxSection = cfg.getConfigurationSection("player-boxes");
+        FileConfiguration mb = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        ConfigurationSection mbSection = mb.getConfigurationSection("player-boxes");
 
-        for (Map.Entry<Player,List<ItemStack>> entry:boxes.entrySet()) {
-            ConfigurationSection player = bxSection.createSection(entry.getKey().getUniqueId().toString());
-            player.addDefault("box",entry.getValue());
+        for (var entry: boxes.entrySet()) {
+            Player p = entry.getKey();
+            String UUID = p.getUniqueId().toString();
+            mbSection.createSection(UUID);
+
+            ConfigurationSection pSection = mb.getConfigurationSection("player-boxes." + UUID);
+            int k = 0;
+            for (ItemStack i:entry.getValue()) {
+                pSection.set(Integer.toString(k), i.toString());
+                k++;
+            }
         }
     }
 
     public void restoreData() {
-        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
-        ConfigurationSection bxSection = cfg.getConfigurationSection("player-boxes");
+        FileConfiguration mb = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        ConfigurationSection mbSection = mb.getConfigurationSection("player-boxes");
 
-        bxSection.getKeys(false).forEach(key -> {
-            List<ItemStack> content = (List<ItemStack>) bxSection.getList("box");
-            boxes.put(Bukkit.getPlayer(key), content);
+        mbSection.getKeys(false).forEach(key -> {
+            System.out.println(" KEY = " + key);
+            System.out.println("PLAYERID = " + Bukkit.getOfflinePlayer(key));
+            System.out.println("PLAYERNAME = " + Bukkit.getPlayer(UUID.fromString(key)).getName());
+            ConfigurationSection pSection = mbSection.getConfigurationSection(key);
+            List<ItemStack> content = new ArrayList<>();
+            pSection.getKeys(false).forEach(i -> content.add(pSection.getItemStack(i)));
+
+            boxes.put(Bukkit.getPlayer(UUID.fromString(key)), content);
         });
     }
 }

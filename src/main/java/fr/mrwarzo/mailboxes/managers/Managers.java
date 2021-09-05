@@ -26,11 +26,15 @@ public class Managers {
             // Envoie d'un message d'erreur à la console
             Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[MailBoxes] Activation interrompue");
             Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + e.toString());
+            e.printStackTrace();
         }
     }
 
     public void unload(MailBoxes mailBoxes) {
         try {
+            //FileConfiguration mbFile =  cfgManager.getConfigurationFile("mailboxes.yml");
+            //MailBoxesFiller.fillWithMap(mailBoxes.getBoxes(),mbFile);
+            instance.saveData();
             cfgManager.saveFiles();
             // Envoie d'un message de validation à la console à la fermeture
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[MailBoxes] Desactivation reussie");
@@ -38,6 +42,7 @@ public class Managers {
             // Envoie d'un message d'erreur à la console
             Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[MailBoxes] Desactivation interrompue");
             Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + e.toString());
+            e.printStackTrace();
         }
     }
 

@@ -31,7 +31,7 @@ public class MailBoxesCommand extends BaseCommand {
     @Subcommand("reload")
     @Syntax("/mailbox reload")
     public static void onReload(Player player, String[] args) {
-        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("config.yml");
         ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
 
         try {
@@ -46,8 +46,10 @@ public class MailBoxesCommand extends BaseCommand {
     @Subcommand("send")
     @Syntax("/mailbox send [player]")
     public static void onSend(Player player, String[] args) {
-        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("config.yml");
+        FileConfiguration mb = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
         ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
+        ConfigurationSection mbSection = cfg.getConfigurationSection("player-boxes");
 
         try {
             ItemStack item = player.getInventory().getItemInMainHand();
@@ -59,11 +61,8 @@ public class MailBoxesCommand extends BaseCommand {
             Player reciever = Bukkit.getPlayer(args[0]);
             Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
 
-            ConfigurationSection bxSection = cfg.getConfigurationSection("player-boxes");
             if (boxes.containsKey(reciever)) {
-                List<ItemStack> items = boxes.get(reciever);
-                items.add(item);
-                boxes.replace(reciever, items);
+                boxes.get(reciever).add(item);
             } else {
                 List<ItemStack> items = new ArrayList<>();
                 items.add(item);
@@ -74,8 +73,8 @@ public class MailBoxesCommand extends BaseCommand {
             player.sendMessage(ChatColor.GREEN + "Vous avez envoyé " + ChatColor.GOLD + item.getAmount() + " * "
                     + item.getI18NDisplayName() + ChatColor.GREEN + " à " + ChatColor.GOLD + reciever.getName());
 
-            ConfigurationSection bxReciever = bxSection.getConfigurationSection(reciever.getUniqueId().toString());
-            bxReciever.createSection("box");
+            //ConfigurationSection bxReciever = mbSection.getConfigurationSection(reciever.getUniqueId().toString());
+            //bxReciever.createSection("box");
 
         } catch (Exception e) {
             player.sendMessage(cfgSection.getString("no-player-arg"));
@@ -89,6 +88,7 @@ public class MailBoxesCommand extends BaseCommand {
         //ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
 
         for (Map.Entry<Player, List<ItemStack>> entry : Managers.getInstance().getBoxes().entrySet()) {
+            player.sendMessage(Managers.getInstance().getBoxes().size() + " d " + Managers.getInstance().getBoxes().toString());
             player.sendMessage(entry.getKey().toString() + " ----- " + entry.getValue().toString());
         }
     }
