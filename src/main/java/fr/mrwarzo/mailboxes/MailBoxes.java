@@ -36,15 +36,15 @@ public final class MailBoxes extends JavaPlugin {
         FileConfiguration mb = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
         ConfigurationSection mbSection = mb.getConfigurationSection("player-boxes");
 
-        for (var entry: boxes.entrySet()) {
+        for (var entry : boxes.entrySet()) {
             Player p = entry.getKey();
             String UUID = p.getUniqueId().toString();
             mbSection.createSection(UUID);
 
             ConfigurationSection pSection = mb.getConfigurationSection("player-boxes." + UUID);
             int k = 0;
-            for (ItemStack i:entry.getValue()) {
-                pSection.set(Integer.toString(k), i.toString());
+            for (ItemStack i : entry.getValue()) {
+                pSection.set(Integer.toString(k), i);
                 k++;
             }
         }
@@ -55,14 +55,14 @@ public final class MailBoxes extends JavaPlugin {
         ConfigurationSection mbSection = mb.getConfigurationSection("player-boxes");
 
         mbSection.getKeys(false).forEach(key -> {
-            System.out.println(" KEY = " + key);
-            System.out.println("PLAYERID = " + Bukkit.getOfflinePlayer(key));
-            System.out.println("PLAYERNAME = " + Bukkit.getPlayer(UUID.fromString(key)).getName());
             ConfigurationSection pSection = mbSection.getConfigurationSection(key);
-            List<ItemStack> content = new ArrayList<>();
-            pSection.getKeys(false).forEach(i -> content.add(pSection.getItemStack(i)));
 
-            boxes.put(Bukkit.getPlayer(UUID.fromString(key)), content);
+            List<ItemStack> content = new ArrayList<>();
+            pSection.getKeys(false).forEach(i -> {
+                content.add(pSection.getItemStack(i));
+            });
+
+            boxes.put((Player)Bukkit.getOfflinePlayer(UUID.fromString(key)), content);
         });
     }
 }

@@ -1,5 +1,6 @@
 package fr.mrwarzo.mailboxes.managers;
 
+import fr.minuskube.inv.InventoryManager;
 import fr.mrwarzo.mailboxes.MailBoxes;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -8,14 +9,18 @@ public class Managers {
     private static MailBoxes instance;
     private static Managers managers;
     private static ConfigManager cfgManager;
+    private static InventoryManager inventoryManager;
 
     public void load(MailBoxes mailBoxes) {
         Managers.instance = mailBoxes;
         Managers.managers = this;
         Managers.cfgManager = new ConfigManager(instance);
+        Managers.inventoryManager = new InventoryManager(instance);
 
         try {
+            inventoryManager.init();
             CommandsManager.loadCommands(instance);
+
             cfgManager.setupFiles();
             instance.restoreData();
 
@@ -56,5 +61,9 @@ public class Managers {
 
     public static ConfigManager getConfigManager() {
         return cfgManager;
+    }
+
+    public static InventoryManager getInventoryManager() {
+        return inventoryManager;
     }
 }

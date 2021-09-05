@@ -26,6 +26,7 @@ public class MbSendMenu implements InventoryProvider {
             .provider(new MbSendMenu())
             .type(InventoryType.CHEST)
             .title("Choisir un destinataire : ")
+            .manager(Managers.getInventoryManager())
             .build();
 
     private MbSendMenu() {

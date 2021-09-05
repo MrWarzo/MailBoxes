@@ -23,6 +23,7 @@ public class MbPackageMenu implements InventoryProvider {
             .type(InventoryType.WORKBENCH)
             .title("Pose le contenu de ton mail : ")
             //.listener(new InventoryClickEvent(InventoryView.OUTSIDE, InventoryType.SlotType.CRAFTING, 1, ClickType.LEFT, InventoryAction.MOVE_TO_OTHER_INVENTORY))
+            .manager(Managers.getInventoryManager())
             .build();
 
     //public InventoryClickEvent(@NotNull InventoryView view, @NotNull SlotType type, int slot, @NotNull ClickType click, @NotNull InventoryAction action) {

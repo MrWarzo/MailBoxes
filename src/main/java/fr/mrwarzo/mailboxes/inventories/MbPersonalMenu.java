@@ -31,10 +31,11 @@ public class MbPersonalMenu implements InventoryProvider {
             .provider(new MbPersonalMenu())
             .size(MbPersonalMenu.rows, 9)
             .title("Ma mailbox : ")
+            .manager(Managers.getInventoryManager())
             .build();
 
     private MbPersonalMenu() {
-        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
+        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("config.yml");
         ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
         MbPersonalMenu.rows = cfgSection.getInt("box-rows");
 

@@ -21,6 +21,7 @@ public class MbMenu implements InventoryProvider {
             .provider(new MbMenu())
             .type(InventoryType.HOPPER)
             .title("MailBox : ")
+            .manager(Managers.getInventoryManager())
             .build();
 
     private MbMenu() {
