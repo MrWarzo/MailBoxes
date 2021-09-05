@@ -125,7 +125,6 @@ public class MailBoxesCommand extends BaseCommand {
     }
 
     @Default
-    @Syntax("/mailbox")
     @CommandPermission("mailbox.open")
     public static void onMb(Player player, String[] args) {
         MbMenu.INVENTORY.open(player);
