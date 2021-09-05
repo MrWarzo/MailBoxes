@@ -15,21 +15,22 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @CommandAlias("mb|mbox|mailbox")
 public class MailBoxesCommand extends BaseCommand {
     @Subcommand("info")
-    @Syntax("/mailbox info")
+    @CommandPermission("mailbox.info")
     public static void onInfo(Player player, String[] args) {
         player.sendMessage("§6------------------------");
         player.sendMessage("§6Nom:      MailBox");
         player.sendMessage("§6Auteur:   MrWarzo");
-        player.sendMessage("§6Version:  0.0.1");
+        player.sendMessage("§6Version:  1.0.0");
         player.sendMessage("§6------------------------");
     }
 
     @Subcommand("reload")
-    @Syntax("/mailbox reload")
+    @CommandPermission("mailbox.reload")
     public static void onReload(Player player, String[] args) {
         FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("config.yml");
         ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
@@ -44,57 +45,88 @@ public class MailBoxesCommand extends BaseCommand {
     }
 
     @Subcommand("send")
-    @Syntax("/mailbox send [player]")
+    @CommandCompletion("@sendMail")
+    @Syntax("<playerName>")
+    @CommandPermission("mailbox.send")
     public static void onSend(Player player, String[] args) {
         FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("config.yml");
-        FileConfiguration mb = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
         ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
-        ConfigurationSection mbSection = cfg.getConfigurationSection("player-boxes");
 
         try {
             ItemStack item = player.getInventory().getItemInMainHand();
 
             if (item.getType().equals(Material.AIR)) {
-                throw new Exception();
+                throw new Exception("EmptyHand");
             }
 
-            Player reciever = Bukkit.getPlayer(args[0]);
-            Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
+            Player reciever;
 
-            if (boxes.containsKey(reciever)) {
-                boxes.get(reciever).add(item);
+            if(args.length == 0 || args[0].isEmpty()) {
+                throw new Exception("EmptyPlayer");
+            }
+            else {
+                reciever = Bukkit.getPlayer(args[0]);
+                if(reciever == null) {
+                    throw new Exception("EmptyPlayer");
+                }
+            }
+
+            Map<UUID, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
+
+            if (boxes.containsKey(reciever.getUniqueId())) {
+                boxes.get(reciever.getUniqueId()).add(item);
             } else {
                 List<ItemStack> items = new ArrayList<>();
                 items.add(item);
-                boxes.put(reciever, items);
+                boxes.put(reciever.getUniqueId(), items);
             }
 
             player.getInventory().setItemInMainHand(null);
             player.sendMessage(ChatColor.GREEN + "Vous avez envoyé " + ChatColor.GOLD + item.getAmount() + " * "
                     + item.getI18NDisplayName() + ChatColor.GREEN + " à " + ChatColor.GOLD + reciever.getName());
 
-            //ConfigurationSection bxReciever = mbSection.getConfigurationSection(reciever.getUniqueId().toString());
-            //bxReciever.createSection("box");
-
         } catch (Exception e) {
-            player.sendMessage(cfgSection.getString("no-player-arg"));
+            if(e.getMessage().equals("EmptyHand")) {
+                player.sendMessage(cfgSection.getString("no-item-arg"));
+            }
+            else if(e.getMessage().equals("EmptyPlayer")) {
+                player.sendMessage(cfgSection.getString("no-player-arg"));
+            }
+            else {
+                player.sendMessage(cfgSection.getString("unknown-error"));
+            }
+        }
+    }
+
+    @Subcommand("see")
+    @CommandCompletion("@sendMail")
+    @Syntax("<playerName>")
+    @CommandPermission("mailbox.see")
+    public static void onSee(Player player, String[] args) {
+        FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("config.yml");
+        ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
+
+        try {
+            Player p = Bukkit.getPlayer(args[0]);
+            //MbPersonalMenu.INVENTORY.open(p);
+            player.sendMessage(Managers.getInstance().getBoxes().get(p).toString());
+        }
+        catch(Exception e) {
+            player.sendMessage(cfgSection.getString("unknown-error"));
         }
     }
 
     @Subcommand("map")
-    @Syntax("/mailbox map")
+    @CommandPermission("mailbox.map")
     public static void onMap(Player player, String[] args) {
-        //FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("mailboxes.yml");
-        //ConfigurationSection cfgSection = cfg.getConfigurationSection("configs");
-
-        for (Map.Entry<Player, List<ItemStack>> entry : Managers.getInstance().getBoxes().entrySet()) {
-            player.sendMessage(Managers.getInstance().getBoxes().size() + " d " + Managers.getInstance().getBoxes().toString());
-            player.sendMessage(entry.getKey().toString() + " ----- " + entry.getValue().toString());
+        for (Map.Entry<UUID, List<ItemStack>> entry : Managers.getInstance().getBoxes().entrySet()) {
+            player.sendMessage(Managers.getInstance().getBoxes().size() + " ->\n " + Managers.getInstance().getBoxes());
         }
     }
 
     @Default
     @Syntax("/mailbox")
+    @CommandPermission("mailbox.open")
     public static void onMb(Player player, String[] args) {
         MbMenu.INVENTORY.open(player);
     }

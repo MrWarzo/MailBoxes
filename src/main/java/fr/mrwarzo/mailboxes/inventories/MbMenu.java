@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class MbMenu implements InventoryProvider {
     private static float vol;
+    private static int mode;
     public static final SmartInventory INVENTORY = SmartInventory.builder()
             .id("mbMenu")
             .provider(new MbMenu())
@@ -33,24 +34,34 @@ public class MbMenu implements InventoryProvider {
         } else {
             MbMenu.vol = 0;
         }
+
+        mode = cfgSection.getInt("menu-mode");
+        if (mode < 1 || mode > 4) {
+            mode = 1;
+        }
     }
 
     @Override
     public void init(Player player, InventoryContents contents) {
+
         final float volume = MbMenu.vol;
 
         contents.set(0, 0, ClickableItem.of(new ItemBuilder(Material.CHEST)
                         .setName("§a§lMa boîte mail")
                         .toItemStack()
                 , e -> openPersMenu(player)));
-        contents.set(0, 1, ClickableItem.of(new ItemBuilder(Material.CHEST_MINECART)
-                        .setName("§a§lEnvoyer un mail à quelqu'un")
-                        .toItemStack()
-                , e -> openSendMenu(player)));
-        contents.set(0, 2, ClickableItem.of(new ItemBuilder(Material.SHIELD)
-                        .setName("§c§lBloquer un joueur")
-                        .toItemStack()
-                , e -> openBlockMenu(player)));
+        if (mode == 2 || mode == 4) {
+            contents.set(0, 1, ClickableItem.of(new ItemBuilder(Material.CHEST_MINECART)
+                            .setName("§a§lEnvoyer un mail à quelqu'un")
+                            .toItemStack()
+                    , e -> openSendMenu(player)));
+        }
+        if (mode == 3 || mode == 4) {
+            contents.set(0, 2, ClickableItem.of(new ItemBuilder(Material.SHIELD)
+                            .setName("§c§lBloquer un joueur")
+                            .toItemStack()
+                    , e -> openBlockMenu(player)));
+        }
 
         contents.set(0, 3, ClickableItem.of(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), e -> player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, volume, 1)));
         contents.set(0, 4, ClickableItem.of(new ItemBuilder(Material.PLAYER_HEAD).setSkullOwner(player.getName()).toItemStack(), e -> player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_DEATH, volume, 1)));

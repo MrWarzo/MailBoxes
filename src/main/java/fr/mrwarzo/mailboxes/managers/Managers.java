@@ -37,8 +37,6 @@ public class Managers {
 
     public void unload(MailBoxes mailBoxes) {
         try {
-            //FileConfiguration mbFile =  cfgManager.getConfigurationFile("mailboxes.yml");
-            //MailBoxesFiller.fillWithMap(mailBoxes.getBoxes(),mbFile);
             instance.saveData();
             cfgManager.saveFiles();
             // Envoie d'un message de validation à la console à la fermeture

@@ -6,10 +6,8 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.Pagination;
 import fr.minuskube.inv.content.SlotIterator;
-import fr.mrwarzo.mailboxes.MailBoxes;
 import fr.mrwarzo.mailboxes.managers.Managers;
 import fr.mrwarzo.mailboxes.tools.ItemBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class MbPersonalMenu implements InventoryProvider {
     private static int rows;
@@ -70,7 +69,7 @@ public class MbPersonalMenu implements InventoryProvider {
     public void update(Player player, InventoryContents contents) {
         Pagination pagination = contents.pagination();
         pagination.setItems(getPlayerBox(player));
-        pagination.setItemsPerPage(27);
+        pagination.setItemsPerPage((MbPersonalMenu.rows - 1) * 9);
         pagination.addToIterator(contents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0));
     }
 
@@ -95,7 +94,7 @@ public class MbPersonalMenu implements InventoryProvider {
     }
 
     private ClickableItem[] getPlayerBox(Player player) {
-        Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
+        Map<UUID, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
         ClickableItem[] clickableItemList;
 
         if (boxes.isEmpty()) {
@@ -104,7 +103,7 @@ public class MbPersonalMenu implements InventoryProvider {
             return clickableItemList;
         }
 
-        List<ItemStack> itemStackList = new ArrayList<>(boxes.get(player));
+        List<ItemStack> itemStackList = new ArrayList<>(boxes.get(player.getUniqueId()));
 
         clickableItemList = new ClickableItem[itemStackList.size()];
 
@@ -120,14 +119,13 @@ public class MbPersonalMenu implements InventoryProvider {
     }
 
     private void getItemInInv(Player player, InventoryClickEvent e) {
-        if(isFull(player.getInventory().getStorageContents())) {
+        if (isFull(player.getInventory().getStorageContents())) {
             player.sendMessage(ChatColor.RED + "Vous n'avez plus de place dans votre inventaire !");
-        }
-        else {
+        } else {
             ItemStack item = e.getCurrentItem();
-            Map<Player, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
+            Map<UUID, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
 
-            boxes.get(player).remove(item);
+            boxes.get(player.getUniqueId()).remove(item);
             player.getInventory().addItem(item);
             player.sendMessage(ChatColor.GREEN + "Vous avez récupéré " + ChatColor.GOLD + item.getAmount() + " * "
                     + item.getI18NDisplayName());
@@ -136,7 +134,7 @@ public class MbPersonalMenu implements InventoryProvider {
 
     private boolean isFull(ItemStack[] storage) {
         int j = storage.length;
-        for (ItemStack i:storage) {
+        for (ItemStack i : storage) {
             if (i != null) {
                 j--;
             }

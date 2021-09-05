@@ -1,10 +1,8 @@
 package fr.mrwarzo.mailboxes;
 
 import fr.mrwarzo.mailboxes.managers.Managers;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,7 +10,7 @@ import java.io.IOException;
 import java.util.*;
 
 public final class MailBoxes extends JavaPlugin {
-    private static Map<Player, List<ItemStack>> boxes;
+    private static Map<UUID, List<ItemStack>> boxes;
 
     Managers managers = new Managers();
 
@@ -28,7 +26,7 @@ public final class MailBoxes extends JavaPlugin {
         managers.unload(this);
     }
 
-    public Map<Player, List<ItemStack>> getBoxes() {
+    public Map<UUID, List<ItemStack>> getBoxes() {
         return boxes;
     }
 
@@ -37,11 +35,10 @@ public final class MailBoxes extends JavaPlugin {
         ConfigurationSection mbSection = mb.getConfigurationSection("player-boxes");
 
         for (var entry : boxes.entrySet()) {
-            Player p = entry.getKey();
-            String UUID = p.getUniqueId().toString();
-            mbSection.createSection(UUID);
+            UUID p = entry.getKey();
+            mbSection.createSection(p.toString());
 
-            ConfigurationSection pSection = mb.getConfigurationSection("player-boxes." + UUID);
+            ConfigurationSection pSection = mb.getConfigurationSection("player-boxes." + p.toString());
             int k = 0;
             for (ItemStack i : entry.getValue()) {
                 pSection.set(Integer.toString(k), i);
@@ -62,7 +59,7 @@ public final class MailBoxes extends JavaPlugin {
                 content.add(pSection.getItemStack(i));
             });
 
-            boxes.put((Player)Bukkit.getOfflinePlayer(UUID.fromString(key)), content);
+            boxes.put(UUID.fromString(key), content);
         });
     }
 }

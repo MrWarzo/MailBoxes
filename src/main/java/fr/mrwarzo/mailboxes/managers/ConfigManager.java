@@ -144,4 +144,8 @@ public class ConfigManager {
         });
         return fileCFG.get();
     }
+
+    public Map<File, FileConfiguration> getFilesMap() {
+        return filesMap;
+    }
 }
