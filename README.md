@@ -16,6 +16,7 @@ Items recus dans la box et pagination
 ![img_1.png](img/img_1.png)
 <br/>
 (page 2)
+<br/>
 ![img.png](img/img.png)
 <br/>
 
