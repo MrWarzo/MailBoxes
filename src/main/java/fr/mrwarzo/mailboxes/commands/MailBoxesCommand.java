@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import fr.mrwarzo.mailboxes.inventories.MbMenu;
 import fr.mrwarzo.mailboxes.managers.Managers;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,6 +12,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +48,7 @@ public class MailBoxesCommand extends BaseCommand {
 
     @Subcommand("send")
     @CommandCompletion("@sendMail")
-    @Syntax("<playerName>")
+    @Syntax("<playerName> <lore>")
     @CommandPermission("mailbox.send")
     public static void onSend(Player player, String[] args) {
         FileConfiguration cfg = Managers.getConfigManager().getConfigurationFile("config.yml");
@@ -54,6 +56,17 @@ public class MailBoxesCommand extends BaseCommand {
 
         try {
             ItemStack item = player.getInventory().getItemInMainHand();
+            ItemMeta meta = item.getItemMeta();
+            List<String> lores = new ArrayList<>();
+
+            if (meta.hasLore()) {
+                StringBuilder s = new StringBuilder();
+                for (Component c : meta.lore()) {
+                    s.append(c);
+                }
+                lores.add(s.toString());
+            }
+            lores.add(ChatColor.GOLD + "De la part de " + ChatColor.DARK_PURPLE + player.getName());
 
             if (item.getType().equals(Material.AIR)) {
                 throw new Exception("EmptyHand");
@@ -61,15 +74,27 @@ public class MailBoxesCommand extends BaseCommand {
 
             Player reciever;
 
-            if(args.length == 0 || args[0].isEmpty()) {
+            if (args.length == 0 || args[0].isEmpty()) {
                 throw new Exception("EmptyPlayer");
-            }
-            else {
+            } else {
                 reciever = Bukkit.getPlayer(args[0]);
-                if(reciever == null) {
+                if (reciever == null) {
                     throw new Exception("EmptyPlayer");
                 }
             }
+
+            if (args.length >= 2) {
+                StringBuilder lore = new StringBuilder();
+
+                for (int i = 1; i < args.length; i++) {
+                    lore.append(ChatColor.BLUE + args[i] + " ");
+                }
+
+                lores.add(lore.toString());
+            }
+
+            meta.setLore(lores);
+            item.setItemMeta(meta);
 
             Map<UUID, List<ItemStack>> boxes = Managers.getInstance().getBoxes();
 
@@ -86,13 +111,11 @@ public class MailBoxesCommand extends BaseCommand {
                     + item.getI18NDisplayName() + ChatColor.GREEN + " à " + ChatColor.GOLD + reciever.getName());
 
         } catch (Exception e) {
-            if(e.getMessage().equals("EmptyHand")) {
+            if (e.getMessage().equals("EmptyHand")) {
                 player.sendMessage(cfgSection.getString("no-item-arg"));
-            }
-            else if(e.getMessage().equals("EmptyPlayer")) {
+            } else if (e.getMessage().equals("EmptyPlayer")) {
                 player.sendMessage(cfgSection.getString("no-player-arg"));
-            }
-            else {
+            } else {
                 player.sendMessage(cfgSection.getString("unknown-error"));
             }
         }
@@ -110,8 +133,7 @@ public class MailBoxesCommand extends BaseCommand {
             Player p = Bukkit.getPlayer(args[0]);
             //MbPersonalMenu.INVENTORY.open(p);
             player.sendMessage(Managers.getInstance().getBoxes().get(p).toString());
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             player.sendMessage(cfgSection.getString("unknown-error"));
         }
     }
