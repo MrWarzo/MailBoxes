@@ -8,7 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.*;
-
+//Main class
 public final class MailBoxes extends JavaPlugin {
     private static Map<UUID, List<ItemStack>> boxes;
 
